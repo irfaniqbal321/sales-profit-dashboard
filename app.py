@@ -6,7 +6,7 @@ import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
-# FIXED FOR MOBILE
+# FIXED FOR MOBILE - 100%
 st.set_page_config(page_title="Sales Performance Analytics", layout="wide", initial_sidebar_state="collapsed")
 
 # --- DARK UI ---
@@ -59,7 +59,7 @@ if page == "Home":
     col2.metric("Total Sales", f"${df['Total_Sale'].sum():,.0f}")
     col3.metric("Avg Margin", f"{df['Profit_Margin'].mean():.1f}%")
     st.markdown("### Business Problem: Company wants to identify low-profit categories and predict future profit.")
-    st.dataframe(df.head(10), use_container_width=True)
+    st.dataframe(df.head(10), width='stretch')
 
 elif page == "Sales Dashboard":
     st.title("Sales Dashboard")
@@ -78,7 +78,7 @@ elif page == "Product Analysis":
     fig, ax = plt.subplots()
     sns.scatterplot(data=df, x='Discount', y='Profit', hue='Product_Category', ax=ax)
     st.pyplot(fig)
-    plt.close()
+    plt.close('all')
     st.bar_chart(df.groupby('Returned')['Profit'].mean())
 
 elif page == "Profit Prediction":
@@ -100,4 +100,4 @@ elif page == "Model Performance":
     model = RandomForestRegressor().fit(X_train,y_train)
     score = model.score(X_test,y_test)
     st.metric("R2 Score", f"{score:.3f}")
-    st.dataframe(pd.DataFrame({'Feature':X.columns, 'Importance':model.feature_importances_}))
+    st.dataframe(pd.DataFrame({'Feature':X.columns, 'Importance':model.feature_importances_}), width='stretch')

@@ -1,27 +1,40 @@
-# Sales Performance Analytics and Profit Prediction
+# 📊 Sales Performance Analytics & Profit Prediction
 
-## Business Problem
-Company wants to identify low-profit categories and predict future profit.
+> A complete Business Intelligence solution to identify low-profit categories and predict future profit.
 
-## Dataset Features
-1500 orders with Customer, Product, Sales details.
+🔗 **Live Demo:** [https://irfan-iqbal-sales-dashboard.streamlit.app]  
+🔗 **GitHub:** https://github.com/irfaniqbal321/sales-profit-dashboard
 
-## Feature Engineering Done
-- Profit_Margin = Profit/Total_Sale*100
-- Age_Group from Customer_Age
-- Order_Month from Order_Date
-- Total_Sale and Profit calculated
+## 🎯 Business Problem
+Company wants to identify low-profit categories and predict future profit to optimize business strategy.
 
-## Dashboard Pages
-1. Home - KPIs
-2. Sales Dashboard - Category & Time analysis
-3. Product Analysis - Discount vs Profit
-4. Profit Prediction - User input prediction
-5. Model Performance - Random Forest R2=0.996
+## 📂 Dataset Features
+- **1500 Orders** with Customer, Product, Sales details
+- Features: Customer_Age, Order_Date, Quantity, Unit_Price, Discount, Shipping_Cost
 
-## Model
-RandomForestRegressor with features: Quantity, Unit_Price, Discount, Shipping_Cost
+## ⚙️ Feature Engineering Done
+- `Profit_Margin = Profit/Total_Sale*100`
+- `Age_Group` from Customer_Age
+- `Order_Month` from Order_Date
+- `Total_Sale` and `Profit` calculated fields
 
-## How to Run
+## 📑 Dashboard Pages
+1.  **Home** - KPIs (Total Sales, Profit, Customers)
+2.  **Sales Dashboard** - Category & Time analysis
+3.  **Product Analysis** - Discount vs Profit insights
+4.  **Profit Prediction** - User input based prediction
+5.  **Model Performance** - Random Forest R² = 0.996
+
+## 🤖 ML Model
+- **Model:** RandomForestRegressor
+- **Features:** Quantity, Unit_Price, Discount, Shipping_Cost
+- **Performance:** R² Score 0.996
+- **Target:** Profit Prediction
+
+## 🛠️ Tech Stack
+Python, Streamlit, Pandas, Scikit-learn, Plotly
+
+## ▶️ How to Run Locally
+```bash
 pip install -r requirements.txt
 streamlit run app.py

@@ -6,24 +6,16 @@ import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
-st.set_page_config(page_title="Sales Performance Analytics", layout="wide", initial_sidebar_state="expanded")
+# FIXED FOR MOBILE
+st.set_page_config(page_title="Sales Performance Analytics", layout="wide", initial_sidebar_state="collapsed")
 
-# --- DARK UI LIKE YOUR SCREENSHOT ---
+# --- DARK UI ---
 st.markdown("""
 <style>
     .stApp { background-color: #0E1628; }
-    h1, h2, h3, p { color: #FFFFFF !important; }
+    h1, h2, h3, p, label { color: #FFFFFF !important; }
     [data-testid="stSidebar"] { background-color: #15223B; }
-    .metric-card {
-        background: #1B2E4F;
-        padding: 18px;
-        border-radius: 12px;
-        border: 1px solid #2A3F63;
-    }
-    .metric-label { color: #8FA1BF; font-size: 13px; }
-    .metric-value { color: #E6EDF7; font-size: 28px; font-weight: 700; }
-    div[data-testid="stMetric"] { background: #1B2E4F; padding: 15px; border-radius: 10px; }
-    div[data-testid="stDataFrame"] { border-radius: 10px; }
+    div[data-testid="stMetric"] { background: #1B2E4F; padding: 15px; border-radius: 10px; border: 1px solid #2A3F63; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -55,21 +47,18 @@ def load_data():
 
 df = load_data()
 
-# --- SIDEBAR LIKE SCREENSHOT ---
 with st.sidebar:
     st.markdown("### Navigation")
-    st.markdown("Go to")
-    page = st.selectbox("Go to", ["Home","Sales Dashboard","Product Analysis","Profit Prediction","Model Performance"], label_visibility="collapsed")
+    page = st.selectbox("Go to", ["Home","Sales Dashboard","Product Analysis","Profit Prediction","Model Performance"])
 
 if page == "Home":
-    st.markdown("# Sales Performance Analytics and Profit Prediction Dashboard")
-    
+    st.markdown("# Sales Performance Analytics")
+    st.markdown("### By Irfan Iqbal - Hackathon 2026")
     col1,col2,col3 = st.columns(3)
     col1.metric("Total Profit", f"${df['Profit'].sum():,.0f}")
     col2.metric("Total Sales", f"${df['Total_Sale'].sum():,.0f}")
     col3.metric("Avg Margin", f"{df['Profit_Margin'].mean():.1f}%")
-    
-    st.markdown("### Business Problem: Company wants to identify low-profit categories, understand customer behavior, and predict future profit.")
+    st.markdown("### Business Problem: Company wants to identify low-profit categories and predict future profit.")
     st.dataframe(df.head(10), use_container_width=True)
 
 elif page == "Sales Dashboard":
@@ -86,11 +75,10 @@ elif page == "Sales Dashboard":
 
 elif page == "Product Analysis":
     st.title("Product & Customer Analysis")
-    fig, ax = plt.subplots(facecolor='#0E1628')
-    ax.set_facecolor('#0E1628')
+    fig, ax = plt.subplots()
     sns.scatterplot(data=df, x='Discount', y='Profit', hue='Product_Category', ax=ax)
-    ax.tick_params(colors='white')
     st.pyplot(fig)
+    plt.close()
     st.bar_chart(df.groupby('Returned')['Profit'].mean())
 
 elif page == "Profit Prediction":
@@ -103,9 +91,6 @@ elif page == "Profit Prediction":
     if st.button("Predict Profit"):
         profit = (qty*price*(1-discount)+ship)*0.22 - ship*0.5
         st.success(f"Predicted Profit: ${profit:.2f}")
-        if profit < 0: st.error("Loss Warning - High risk!")
-        elif profit < 500: st.warning("Low Profit")
-        else: st.success("High Profit - Good to go!")
 
 elif page == "Model Performance":
     st.title("ML Model - Random Forest")

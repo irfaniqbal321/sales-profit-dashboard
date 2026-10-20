@@ -1,15 +1,12 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
-# FIXED FOR MOBILE - 100%
-st.set_page_config(page_title="Sales Performance Analytics", layout="wide", initial_sidebar_state="collapsed")
+# FIXED FOR 2GB MOBILE + LAPTOP BOTH
+st.set_page_config(page_title="Sales Performance Analytics", layout="centered", initial_sidebar_state="collapsed")
 
-# --- DARK UI ---
 st.markdown("""
 <style>
     .stApp { background-color: #0E1628; }
@@ -22,7 +19,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     np.random.seed(42)
-    n=1500
+    n=500  # 1500 se 500 kiya - mobile ke liye
     data = {
         'Order_Date': pd.date_range('2023-01-01', periods=n, freq='D'),
         'Customer_Gender': np.random.choice(['Male','Female'], n),
@@ -59,7 +56,7 @@ if page == "Home":
     col2.metric("Total Sales", f"${df['Total_Sale'].sum():,.0f}")
     col3.metric("Avg Margin", f"{df['Profit_Margin'].mean():.1f}%")
     st.markdown("### Business Problem: Company wants to identify low-profit categories and predict future profit.")
-    st.dataframe(df.head(10), width='stretch')
+    st.dataframe(df.head(10), use_container_width=True)
 
 elif page == "Sales Dashboard":
     st.title("Sales Dashboard")
@@ -75,10 +72,10 @@ elif page == "Sales Dashboard":
 
 elif page == "Product Analysis":
     st.title("Product & Customer Analysis")
-    fig, ax = plt.subplots()
-    sns.scatterplot(data=df, x='Discount', y='Profit', hue='Product_Category', ax=ax)
-    st.pyplot(fig)
-    plt.close('all')
+    st.subheader("Discount vs Profit")
+    # Seaborn ki jagah light chart - same output!
+    st.scatter_chart(df, x='Discount', y='Profit', color='Product_Category')
+    st.subheader("Profit by Return Status")
     st.bar_chart(df.groupby('Returned')['Profit'].mean())
 
 elif page == "Profit Prediction":
@@ -94,10 +91,12 @@ elif page == "Profit Prediction":
 
 elif page == "Model Performance":
     st.title("ML Model - Random Forest")
-    X = df[['Quantity','Unit_Price','Discount','Shipping_Cost']]
-    y = df['Profit']
-    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
-    model = RandomForestRegressor().fit(X_train,y_train)
-    score = model.score(X_test,y_test)
-    st.metric("R2 Score", f"{score:.3f}")
-    st.dataframe(pd.DataFrame({'Feature':X.columns, 'Importance':model.feature_importances_}), width='stretch')
+    st.info("Click to train - mobile RAM bachane ke liye")
+    if st.button("Train Model"):
+        X = df[['Quantity','Unit_Price','Discount','Shipping_Cost']]
+        y = df['Profit']
+        X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+        model = RandomForestRegressor(n_estimators=20).fit(X_train,y_train)
+        score = model.score(X_test,y_test)
+        st.metric("R2 Score", f"{score:.3f}")
+        st.dataframe(pd.DataFrame({'Feature':X.columns, 'Importance':model.feature_importances_}), use_container_width=True)

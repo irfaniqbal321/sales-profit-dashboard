@@ -6,15 +6,6 @@ from sklearn.model_selection import train_test_split
 
 st.set_page_config(page_title="Sales Performance Analytics", layout="centered")
 
-# Simple CSS - sidebar wala hata diya
-st.markdown("""
-<style>
-    .stApp { background-color: #0E1628; }
-    h1, h2, h3, p, label, span { color: #FFFFFF !important; }
-    div[data-testid="stMetric"] { background: #1B2E4F; padding: 15px; border-radius: 10px; border: 1px solid #2A3F63; }
-</style>
-""", unsafe_allow_html=True)
-
 @st.cache_data
 def load_data():
     np.random.seed(42)
@@ -38,22 +29,20 @@ def load_data():
     df['Profit'] = df['Total_Sale']*0.22 - df['Shipping_Cost']*0.5
     df['Profit_Margin'] = df['Profit']/df['Total_Sale']*100
     df['Order_Month'] = pd.to_datetime(df['Order_Date']).dt.month
-    df['Age_Group'] = pd.cut(df['Customer_Age'], bins=[0,30,50,100], labels=['Youth','Adult','Senior'])
     return df
 
 df = load_data()
 
-# MOBILE FIX: Sidebar ki jagah yahan dropdown
 page = st.selectbox("Go to", ["Home","Sales Dashboard","Product Analysis","Profit Prediction","Model Performance"])
 
 if page == "Home":
     st.title("Sales Performance Analytics")
-    st.markdown("### By Irfan Iqbal - Hackathon 2026")
+    st.write("### By Irfan Iqbal - Hackathon 2026")
     col1,col2,col3 = st.columns(3)
     col1.metric("Total Profit", f"${df['Profit'].sum():,.0f}")
     col2.metric("Total Sales", f"${df['Total_Sale'].sum():,.0f}")
     col3.metric("Avg Margin", f"{df['Profit_Margin'].mean():.1f}%")
-    st.markdown("**Business Problem:** Company wants to identify low-profit categories and predict future profit.")
+    st.write("**Business Problem:** Company wants to identify low-profit categories and predict future profit.")
     st.dataframe(df.head(10), use_container_width=True)
 
 elif page == "Sales Dashboard":
@@ -62,30 +51,24 @@ elif page == "Sales Dashboard":
     st.bar_chart(df.groupby('Product_Category')['Total_Sale'].sum())
     st.subheader("Monthly Sales Trend")
     st.line_chart(df.groupby('Order_Month')['Total_Sale'].sum())
-    st.subheader("Profit by City")
-    st.bar_chart(df.groupby('City')['Profit'].sum())
 
 elif page == "Product Analysis":
     st.title("Product & Customer Analysis")
     st.subheader("Discount vs Profit")
     st.scatter_chart(df, x='Discount', y='Profit', color='Product_Category')
-    st.subheader("Profit by Return Status")
-    st.bar_chart(df.groupby('Returned')['Profit'].mean())
 
 elif page == "Profit Prediction":
     st.title("Profit Prediction")
-    col1,col2 = st.columns(2)
-    qty = col1.number_input("Quantity",1,20,2)
-    price = col1.number_input("Unit Price",100,10000,1000)
-    discount = col2.slider("Discount",0.0,0.5,0.1)
-    ship = col2.number_input("Shipping Cost", 50, 500, 100)
+    qty = st.number_input("Quantity",1,20,2)
+    price = st.number_input("Unit Price",100,10000,1000)
+    discount = st.slider("Discount",0.0,0.5,0.1)
+    ship = st.number_input("Shipping Cost", 50, 500, 100)
     if st.button("Predict Profit"):
         profit = (qty*price*(1-discount)+ship)*0.22 - ship*0.5
         st.success(f"Predicted Profit: ${profit:.2f}")
 
 elif page == "Model Performance":
     st.title("ML Model - Random Forest")
-    st.info("Click to train - mobile RAM safe")
     if st.button("Train Model"):
         X = df[['Quantity','Unit_Price','Discount','Shipping_Cost']]
         y = df['Profit']
@@ -93,4 +76,3 @@ elif page == "Model Performance":
         model = RandomForestRegressor(n_estimators=20).fit(X_train,y_train)
         score = model.score(X_test,y_test)
         st.metric("R2 Score", f"{score:.3f}")
-        st.dataframe(pd.DataFrame({'Feature':X.columns, 'Importance':model.feature_importances_}), use_container_width=True)

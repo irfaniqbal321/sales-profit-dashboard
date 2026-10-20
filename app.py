@@ -4,14 +4,13 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
-# FIXED FOR 2GB MOBILE + LAPTOP BOTH
-st.set_page_config(page_title="Sales Performance Analytics", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Sales Performance Analytics", layout="centered")
 
+# Simple CSS - sidebar wala hata diya
 st.markdown("""
 <style>
     .stApp { background-color: #0E1628; }
-    h1, h2, h3, p, label { color: #FFFFFF !important; }
-    [data-testid="stSidebar"] { background-color: #15223B; }
+    h1, h2, h3, p, label, span { color: #FFFFFF !important; }
     div[data-testid="stMetric"] { background: #1B2E4F; padding: 15px; border-radius: 10px; border: 1px solid #2A3F63; }
 </style>
 """, unsafe_allow_html=True)
@@ -19,7 +18,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     np.random.seed(42)
-    n=500  # 1500 se 500 kiya - mobile ke liye
+    n=500
     data = {
         'Order_Date': pd.date_range('2023-01-01', periods=n, freq='D'),
         'Customer_Gender': np.random.choice(['Male','Female'], n),
@@ -44,36 +43,31 @@ def load_data():
 
 df = load_data()
 
-with st.sidebar:
-    st.markdown("### Navigation")
-    page = st.selectbox("Go to", ["Home","Sales Dashboard","Product Analysis","Profit Prediction","Model Performance"])
+# MOBILE FIX: Sidebar ki jagah yahan dropdown
+page = st.selectbox("Go to", ["Home","Sales Dashboard","Product Analysis","Profit Prediction","Model Performance"])
 
 if page == "Home":
-    st.markdown("# Sales Performance Analytics")
+    st.title("Sales Performance Analytics")
     st.markdown("### By Irfan Iqbal - Hackathon 2026")
     col1,col2,col3 = st.columns(3)
     col1.metric("Total Profit", f"${df['Profit'].sum():,.0f}")
     col2.metric("Total Sales", f"${df['Total_Sale'].sum():,.0f}")
     col3.metric("Avg Margin", f"{df['Profit_Margin'].mean():.1f}%")
-    st.markdown("### Business Problem: Company wants to identify low-profit categories and predict future profit.")
+    st.markdown("**Business Problem:** Company wants to identify low-profit categories and predict future profit.")
     st.dataframe(df.head(10), use_container_width=True)
 
 elif page == "Sales Dashboard":
     st.title("Sales Dashboard")
-    c1,c2 = st.columns(2)
-    with c1:
-        st.subheader("Sales by Category")
-        st.bar_chart(df.groupby('Product_Category')['Total_Sale'].sum())
-    with c2:
-        st.subheader("Monthly Sales Trend")
-        st.line_chart(df.groupby('Order_Month')['Total_Sale'].sum())
+    st.subheader("Sales by Category")
+    st.bar_chart(df.groupby('Product_Category')['Total_Sale'].sum())
+    st.subheader("Monthly Sales Trend")
+    st.line_chart(df.groupby('Order_Month')['Total_Sale'].sum())
     st.subheader("Profit by City")
     st.bar_chart(df.groupby('City')['Profit'].sum())
 
 elif page == "Product Analysis":
     st.title("Product & Customer Analysis")
     st.subheader("Discount vs Profit")
-    # Seaborn ki jagah light chart - same output!
     st.scatter_chart(df, x='Discount', y='Profit', color='Product_Category')
     st.subheader("Profit by Return Status")
     st.bar_chart(df.groupby('Returned')['Profit'].mean())
@@ -91,7 +85,7 @@ elif page == "Profit Prediction":
 
 elif page == "Model Performance":
     st.title("ML Model - Random Forest")
-    st.info("Click to train - mobile RAM bachane ke liye")
+    st.info("Click to train - mobile RAM safe")
     if st.button("Train Model"):
         X = df[['Quantity','Unit_Price','Discount','Shipping_Cost']]
         y = df['Profit']
